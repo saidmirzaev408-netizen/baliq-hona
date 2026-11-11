@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { Icons } from './Icons';
+import { useTranslation } from '../i18n/LanguageContext';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
-export function Settings({ onResetData, showToast, currentUser, onLogout }) {
+export function Settings({ onResetData, onApplyConvenientPrices, showToast, currentUser, onLogout }) {
+  const { t } = useTranslation();
   const [businessName, setBusinessName] = useState("Fish House – Aquarium & Fish Management Platform");
   const [currency] = useState("UZS (O'zbek so'mi)");
   const [email, setEmail] = useState("admin@fishhouse.uz");
@@ -9,16 +12,32 @@ export function Settings({ onResetData, showToast, currentUser, onLogout }) {
 
   const handleSave = (e) => {
     e.preventDefault();
-    showToast("Sozlamalar muvaffaqiyatli saqlandi!");
+    showToast(t('common.success') + "!");
   };
 
   return (
     <div className="max-w-4xl space-y-8 animate-fadeIn">
       <div>
         <h1 className="font-heading font-black text-2xl sm:text-3xl text-white">
-          Tizim <span className="gradient-text-cyan">Sozlamalari</span>
+          {t('settings.title')}
         </h1>
-        <p className="text-sm text-slate-400">Platforma konfiguratsiyasi, profil va ma'lumotlar xavfsizligi</p>
+        <p className="text-sm text-slate-300 mt-1">{t('settings.subtitle')}</p>
+      </div>
+
+      {/* 🌐 System Language Switcher Section */}
+      <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-cyan-500/30 shadow-xl shadow-black/40">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-xl shadow-inner">
+            🌐
+          </div>
+          <div>
+            <h3 className="font-heading font-black text-lg sm:text-xl text-white">
+              {t('settings.languageSection')}
+            </h3>
+            <p className="text-xs text-slate-300 mt-0.5">{t('settings.languageDesc')}</p>
+          </div>
+        </div>
+        <LanguageSwitcher variant="full" />
       </div>
 
       {/* Current User Profile Section */}
@@ -104,6 +123,25 @@ export function Settings({ onResetData, showToast, currentUser, onLogout }) {
           </button>
         </div>
       </form>
+
+      {/* Quick Price Optimization Box */}
+      <div className="glass-panel p-6 sm:p-8 rounded-3xl space-y-4 border border-emerald-500/30">
+        <h3 className="font-heading font-bold text-lg text-white flex items-center gap-2">
+          <span>⚡</span> Baliq Narxlarini Qulaylashtirish (Optimallashtirish)
+        </h3>
+        <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+          Barcha 15 xil baliqlar uchun narxlarni hamyonbop, arzon va real bozor talablariga mos qulay narxlarga darhol o'tkazish.
+        </p>
+        <div className="pt-2">
+          <button
+            type="button"
+            onClick={onApplyConvenientPrices}
+            className="px-5 py-2.5 rounded-xl bg-emerald-600/90 hover:bg-emerald-500 text-white font-semibold text-sm shadow-lg shadow-emerald-950/50 transition flex items-center gap-2"
+          >
+            <span>⚡</span> Qulay Narxlarni Bazasiga Qo'llash
+          </button>
+        </div>
+      </div>
 
       {/* Database Backup & Reset Box */}
       <div className="glass-panel p-6 sm:p-8 rounded-3xl space-y-4 border border-rose-500/30">

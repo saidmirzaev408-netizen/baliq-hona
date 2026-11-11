@@ -1,8 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { formatUZS } from '../utils/formatters';
 import { Icons } from './Icons';
+import { useTranslation } from '../i18n/LanguageContext';
 
-export function FishRooms({ rooms, calculateRoomStats, onSelectRoom, onToggleStatus, onAddRoom }) {
+export function FishRooms({ rooms, calculateRoomStats, onSelectRoom, onToggleStatus, onAddRoom, onSyncAccurateData }) {
+  const { t, tRoom } = useTranslation();
   const [filter, setFilter] = useState('ALL'); // ALL, AVAILABLE, OCCUPIED
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -24,41 +26,52 @@ export function FishRooms({ rooms, calculateRoomStats, onSelectRoom, onToggleSta
   return (
     <div className="space-y-6 animate-fadeIn">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-slate-900/85 backdrop-blur-md rounded-2xl p-5 border border-slate-800 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="font-heading font-black text-2xl sm:text-3xl text-white">
-            Akvarium <span className="gradient-text-cyan">Zallari (Fish Rooms)</span>
+          <h1 className="font-heading font-bold text-2xl sm:text-3xl text-white">
+            {t('rooms.title')}
           </h1>
-          <p className="text-sm text-slate-400">Barcha xonalarning to'liq ro'yxati va bandlik nazorati</p>
+          <p className="text-xs sm:text-sm text-slate-300 mt-1">{t('rooms.subtitle')}</p>
         </div>
-        <button 
-          onClick={onAddRoom}
-          className="px-5 py-2.5 rounded-xl gradient-btn text-white font-semibold text-sm flex items-center gap-2 self-start sm:self-auto shadow-lg shadow-cyan-500/25"
-        >
-          <Icons.Plus /> Yangi Xona Yaratish
-        </button>
+        <div className="flex flex-wrap items-center gap-2.5">
+          {onSyncAccurateData && (
+            <button
+              onClick={onSyncAccurateData}
+              className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-emerald-400 border border-slate-700 font-semibold text-xs sm:text-sm flex items-center gap-1.5 transition"
+              title={t('rooms.syncBtn')}
+            >
+              <span>⚡</span> {t('rooms.syncBtn')}
+            </button>
+          )}
+          <button
+            onClick={onAddRoom}
+            className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs sm:text-sm flex items-center gap-2 transition shadow-sm"
+          >
+            <Icons.Plus /> {t('rooms.createNew')}
+          </button>
+        </div>
       </div>
 
       {/* Filters & Search Toolbar */}
-      <div className="glass-panel p-4 rounded-2xl flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+      <div className="bg-slate-900/85 backdrop-blur-md p-3.5 sm:p-4 rounded-2xl border border-slate-800 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         {/* Filter Buttons */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
           {[
-            { id: 'ALL', label: 'Barcha Xonalar', count: rooms.length },
-            { id: 'AVAILABLE', label: 'Bo\'sh (Available)', count: rooms.filter(r => r.status === 'AVAILABLE').length, badgeColor: 'bg-emerald-500/20 text-emerald-300' },
-            { id: 'OCCUPIED', label: 'Band (Occupied)', count: rooms.filter(r => r.status === 'OCCUPIED').length, badgeColor: 'bg-rose-500/20 text-rose-300' }
+            { id: 'ALL', label: t('rooms.allRooms'), count: rooms.length },
+            { id: 'AVAILABLE', label: t('rooms.availableOnly'), count: rooms.filter(r => r.status === 'AVAILABLE').length, badgeColor: 'bg-emerald-500/10 text-emerald-400' },
+            { id: 'OCCUPIED', label: t('rooms.occupiedOnly'), count: rooms.filter(r => r.status === 'OCCUPIED').length, badgeColor: 'bg-rose-500/10 text-rose-400' }
           ].map(tab => (
             <button
               key={tab.id}
               onClick={() => setFilter(tab.id)}
-              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap flex items-center gap-2 ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap flex items-center gap-2 ${
                 filter === tab.id
-                  ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg shadow-cyan-900/40'
-                  : 'bg-slate-800/60 hover:bg-slate-800 text-slate-300'
+                  ? 'bg-cyan-600 text-white shadow-sm'
+                  : 'bg-slate-850 hover:bg-slate-800 text-slate-300 border border-slate-800'
               }`}
             >
               <span>{tab.label}</span>
-              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${tab.badgeColor || 'bg-slate-700 text-slate-200'}`}>
+              <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-bold ${tab.badgeColor || 'bg-slate-800 text-slate-300'}`}>
                 {tab.count}
               </span>
             </button>
@@ -72,13 +85,13 @@ export function FishRooms({ rooms, calculateRoomStats, onSelectRoom, onToggleSta
           </div>
           <input
             type="text"
-            placeholder="Xona nomi yoki raqami..."
+            placeholder={t('rooms.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-9 pr-4 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-900/80 border border-slate-700/80 focus:border-cyan-400 focus:outline-none transition text-white"
           />
           {searchQuery && (
-            <button 
+            <button
               onClick={() => setSearchQuery('')}
               className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white"
             >
@@ -100,98 +113,134 @@ export function FishRooms({ rooms, calculateRoomStats, onSelectRoom, onToggleSta
           {filteredRooms.map(room => {
             const rStats = calculateRoomStats(room);
             const isOccupied = room.status === 'OCCUPIED';
+            const capacity = room.capacity || 100;
+            const occupancyPct = Math.min(100, Math.round((rStats.totalCount / capacity) * 100));
 
             return (
-              <div 
+              <div
                 key={room.id}
-                className="glass-panel glass-panel-hover rounded-2xl overflow-hidden flex flex-col justify-between group"
+                className="bg-slate-900/85 backdrop-blur-md rounded-2xl overflow-hidden flex flex-col justify-between border border-slate-800/80 hover:border-slate-700 transition duration-200 shadow-sm"
               >
                 <div>
-                  {/* Cover Image */}
-                  <div className="relative h-48 overflow-hidden bg-slate-900">
-                    <img 
-                      src={room.image} 
+                  {/* Cover Image Banner */}
+                  <div className="relative h-48 overflow-hidden bg-slate-950">
+                    <img
+                      src={room.image}
                       alt={room.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent"></div>
 
-                    {/* Room Number */}
-                    <div className="absolute top-3 left-3 bg-slate-950/80 backdrop-blur-md px-3 py-1 rounded-lg border border-cyan-500/30 text-cyan-300 font-mono font-bold text-xs">
+                    {/* Room Code Pill */}
+                    <div className="absolute top-3 left-3 bg-slate-950/85 backdrop-blur-md px-2.5 py-0.5 rounded-lg border border-slate-700 text-cyan-300 font-mono font-bold text-xs">
                       {room.number}
                     </div>
 
-                    {/* OCCUPIED / AVAILABLE Badge */}
+                    {/* Status Pill — Clean human SaaS aesthetic */}
                     <div className="absolute top-3 right-3">
                       {isOccupied ? (
-                        <span className="px-3.5 py-1 rounded-full text-xs font-extrabold tracking-wider bg-rose-600 text-white shadow-lg shadow-rose-950/80 ring-2 ring-rose-400/40">
-                          OCCUPIED
-                        </span>
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-950/85 backdrop-blur-md border border-rose-500/40 text-rose-300 shadow-sm">
+                          <span className="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+                          <span>{t('common.occupied')}</span>
+                        </div>
                       ) : (
-                        <span className="px-3.5 py-1 rounded-full text-xs font-extrabold tracking-wider bg-emerald-500 text-white shadow-lg shadow-emerald-950/80 ring-2 ring-emerald-400/40">
-                          AVAILABLE
-                        </span>
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-950/85 backdrop-blur-md border border-emerald-500/40 text-emerald-300 shadow-sm">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                          <span>{t('common.available')}</span>
+                        </div>
                       )}
                     </div>
 
-                    {/* Bottom Tag in image */}
-                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs">
-                      <span className="text-slate-300 font-medium">Sig'im: {room.capacity} ta baliq</span>
-                      <span className="text-cyan-300 font-mono font-semibold">T: {room.temp}</span>
+                    {/* Floating Sensor Badges (Temp & pH) */}
+                    <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between text-[11px]">
+                      <div className="flex items-center gap-2 bg-slate-950/85 backdrop-blur-md px-2.5 py-0.5 rounded-lg border border-slate-700 text-slate-300 font-mono">
+                        <span>🌡️ <strong className="text-cyan-300">{room.temp}</strong></span>
+                        <span className="text-slate-600">|</span>
+                        <span>💧 pH <strong className="text-cyan-300">{room.ph || '7.2'}</strong></span>
+                      </div>
+
+                      <span className="bg-slate-950/85 backdrop-blur-md px-2.5 py-0.5 rounded-lg border border-slate-700 text-slate-300 font-medium">
+                        {t('rooms.capacity')}: <strong className="text-white">{room.capacity}</strong>
+                      </span>
                     </div>
                   </div>
 
-                  {/* Info Body */}
+                  {/* Card Body */}
                   <div className="p-5">
-                    <h3 className="font-heading font-bold text-lg text-white group-hover:text-cyan-300 transition-colors">
-                      {room.name}
+                    <h3 className="font-heading font-black text-lg text-white group-hover:text-cyan-300 transition-colors leading-snug">
+                      {tRoom(room.name)}
                     </h3>
 
-                    <div className="grid grid-cols-2 gap-2 mt-4 text-xs">
-                      <div className="glass-card-subtle p-2.5 rounded-xl">
-                        <span className="text-slate-400 block text-[10px]">Baliqlar soni</span>
-                        <span className="font-bold text-white text-sm">{rStats.totalCount} dona</span>
+                    {/* Occupancy Progress Bar */}
+                    <div className="mt-3">
+                      <div className="flex items-center justify-between text-[11px] mb-1.5 text-slate-400">
+                        <span>{t('rooms.roomFullness')}:</span>
+                        <span className="font-mono font-bold text-cyan-300">{occupancyPct}%</span>
                       </div>
-                      <div className="glass-card-subtle p-2.5 rounded-xl">
-                        <span className="text-slate-400 block text-[10px]">Turlari</span>
-                        <span className="font-bold text-cyan-400 text-sm">{rStats.speciesCount} xil</span>
+                      <div className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${occupancyPct > 80
+                              ? 'bg-gradient-to-r from-amber-500 to-rose-500'
+                              : 'bg-gradient-to-r from-cyan-500 to-emerald-400'
+                            }`}
+                          style={{ width: `${occupancyPct}%` }}
+                        ></div>
                       </div>
                     </div>
 
-                    <div className="mt-4 pt-3 border-t border-slate-800 space-y-1 text-xs">
+                    {/* Quick Stats Grid */}
+                    <div className="grid grid-cols-2 gap-2 mt-3.5 text-xs">
+                      <div className="p-2.5 rounded-xl bg-slate-850/60 border border-slate-800 flex items-center gap-2">
+                        <span>🐠</span>
+                        <div>
+                          <span className="text-slate-400 block text-[10px]">{t('dashboard.fishCount')}</span>
+                          <span className="font-bold text-white text-xs">{rStats.totalCount} {t('common.dona')}</span>
+                        </div>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-slate-850/60 border border-slate-800 flex items-center gap-2">
+                        <span>🧬</span>
+                        <div>
+                          <span className="text-slate-400 block text-[10px]">{t('dashboard.speciesCount')}</span>
+                          <span className="font-bold text-cyan-300 text-xs">{rStats.speciesCount} {t('common.xil')}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Financial Summary */}
+                    <div className="mt-3.5 pt-3 border-t border-slate-800 space-y-1.5 text-xs">
                       <div className="flex justify-between items-center">
-                        <span className="text-slate-400">Umumiy xona qiymati:</span>
-                        <span className="font-bold text-emerald-400 text-sm">{formatUZS(rStats.totalValue)}</span>
+                        <span className="text-slate-400">{t('rooms.roomValue')}:</span>
+                        <span className="font-mono font-bold text-emerald-400 text-xs">{formatUZS(rStats.totalValue)}</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-slate-400">Jami savdo:</span>
-                        <span className="font-semibold text-slate-300">{formatUZS(room.sales)}</span>
+                        <span className="text-slate-400">{t('rooms.salesTotal')}:</span>
+                        <span className="font-mono font-bold text-amber-300 text-xs">{formatUZS(room.sales)}</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Actions footer */}
-                <div className="p-5 pt-0 flex items-center gap-2">
-                  <button 
+                {/* Actions Footer */}
+                <div className="p-4 sm:p-5 pt-0 flex items-center gap-2">
+                  <button
                     onClick={() => onSelectRoom(room.id)}
-                    className="flex-1 py-2.5 rounded-xl gradient-btn text-white text-xs font-semibold shadow-md shadow-cyan-950/40 text-center"
+                    className="flex-1 py-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition"
                   >
-                    Batafsil Hisobot
+                    <span>{t('rooms.detailedReport')}</span>
+                    <span>→</span>
                   </button>
                   <button
                     onClick={() => onToggleStatus(room.id)}
-                    title="Statusni almashtirish"
-                    className={`p-2.5 rounded-xl border text-xs font-bold transition ${
-                      isOccupied 
-                        ? 'bg-rose-500/10 text-rose-300 border-rose-500/30 hover:bg-rose-500/20' 
+                    title={isOccupied ? t('rooms.freeRoom') : t('rooms.occupyRoom')}
+                    className={`px-3 py-2 rounded-xl text-xs font-semibold transition border ${
+                      isOccupied
+                        ? 'bg-rose-500/10 text-rose-300 border-rose-500/30 hover:bg-rose-500/20'
                         : 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/20'
                     }`}
                   >
-                    {isOccupied ? 'Bo\'shatish' : 'Band qilish'}
+                    {isOccupied ? t('rooms.freeRoom') : t('rooms.occupyRoom')}
                   </button>
                 </div>
-
               </div>
             );
           })}

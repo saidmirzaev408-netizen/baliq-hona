@@ -21,19 +21,38 @@ export default function App() {
     return saved ? JSON.parse(saved) : null;
   });
 
-  // LocalStorage state management
+  // Version key for accurate verified images and prices
+  const SYSTEM_DATA_VERSION = 'fishhouse_v4_accurate_images_and_prices';
+
+  // LocalStorage state management with auto-migration
   const [rooms, setRooms] = useState(() => {
+    const version = localStorage.getItem('fishhouse_sys_ver');
     const saved = localStorage.getItem('fishhouse_rooms_v1');
+    if (version !== SYSTEM_DATA_VERSION) {
+      localStorage.setItem('fishhouse_sys_ver', SYSTEM_DATA_VERSION);
+      localStorage.setItem('fishhouse_rooms_v1', JSON.stringify(DEFAULT_ROOMS));
+      localStorage.setItem('fishhouse_fish_v1', JSON.stringify(DEFAULT_FISH));
+      localStorage.setItem('fishhouse_trans_v1', JSON.stringify(DEFAULT_TRANSACTIONS));
+      return DEFAULT_ROOMS;
+    }
     return saved ? JSON.parse(saved) : DEFAULT_ROOMS;
   });
 
   const [fishList, setFishList] = useState(() => {
+    const version = localStorage.getItem('fishhouse_sys_ver');
     const saved = localStorage.getItem('fishhouse_fish_v1');
+    if (version !== SYSTEM_DATA_VERSION) {
+      return DEFAULT_FISH;
+    }
     return saved ? JSON.parse(saved) : DEFAULT_FISH;
   });
 
   const [transactions, setTransactions] = useState(() => {
+    const version = localStorage.getItem('fishhouse_sys_ver');
     const saved = localStorage.getItem('fishhouse_trans_v1');
+    if (version !== SYSTEM_DATA_VERSION) {
+      return DEFAULT_TRANSACTIONS;
+    }
     return saved ? JSON.parse(saved) : DEFAULT_TRANSACTIONS;
   });
 
@@ -331,6 +350,18 @@ export default function App() {
     setSaleRecordModal({ isOpen: false, roomId: null });
   };
 
+  // Apply 100% accurate pictures, realistic prices, and clean room data
+  const handleApplyConvenientPrices = () => {
+    setRooms(DEFAULT_ROOMS);
+    setFishList(DEFAULT_FISH);
+    setTransactions(DEFAULT_TRANSACTIONS);
+    localStorage.setItem('fishhouse_sys_ver', SYSTEM_DATA_VERSION);
+    localStorage.setItem('fishhouse_rooms_v1', JSON.stringify(DEFAULT_ROOMS));
+    localStorage.setItem('fishhouse_fish_v1', JSON.stringify(DEFAULT_FISH));
+    localStorage.setItem('fishhouse_trans_v1', JSON.stringify(DEFAULT_TRANSACTIONS));
+    showToast("Barcha xonalar va baliqlarga to'g'ri rasmlar va to'g'ri narxlar o'rnatildi! 🎉", 'success');
+  };
+
   // Reset Demo Data
   const resetDemoData = () => {
     setConfirmDialog({
@@ -363,22 +394,39 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row relative z-10 text-slate-200">
-      {/* Ambient Glows */}
-      <div className="ambient-glow bg-cyan-500 top-[-100px] left-[-100px]"></div>
-      <div className="ambient-glow bg-blue-600 bottom-[-150px] right-[-100px]"></div>
-      <div className="ambient-glow bg-emerald-500 top-1/2 left-1/3 opacity-5"></div>
+      {/* 🌊 Elegant Ambient Live Aquarium Background */}
+      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster="https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1920&q=80"
+          className="w-full h-full object-cover opacity-35 filter brightness-90 contrast-105 saturate-110"
+        >
+          <source src="https://upload.wikimedia.org/wikipedia/commons/2/29/Freshwater_fish.webm" type="video/webm" />
+          <source src="https://upload.wikimedia.org/wikipedia/commons/2/22/Tropical_Fish_Banner_Fish_on_Coral_Reef.webm" type="video/webm" />
+        </video>
+        {/* Deep, refined obsidian slate overlay for professional SaaS readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#060c18]/80 via-[#071329]/70 to-[#060c18]/85 backdrop-blur-[2px]"></div>
+      </div>
+
+      {/* Dynamic Ambient Ocean Glows */}
+      <div className="ambient-glow bg-cyan-500/15 top-[-80px] left-[-80px] w-[550px] h-[550px]"></div>
+      <div className="ambient-glow bg-blue-600/10 bottom-[-100px] right-[-80px] w-[600px] h-[600px]"></div>
+      <div className="ambient-glow bg-emerald-500/10 top-1/3 left-1/2 w-[500px] h-[500px]"></div>
 
       {/* Toast Notification */}
       {toast && (
-        <div className={`fixed top-6 right-6 z-50 flex items-center gap-3 px-5 py-4 rounded-xl shadow-2xl transition-all duration-300 border ${
+        <div className={`fixed top-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-2xl backdrop-blur-xl transition-all duration-300 border ${
           toast.type === 'error' 
-            ? 'bg-rose-950/90 border-rose-500/40 text-rose-200 shadow-rose-900/30' 
+            ? 'bg-rose-950/90 border-rose-500/50 text-rose-200 shadow-rose-950/50' 
             : toast.type === 'info'
-            ? 'bg-sky-950/90 border-sky-500/40 text-sky-200 shadow-sky-900/30'
-            : 'bg-emerald-950/90 border-emerald-500/40 text-emerald-200 shadow-emerald-900/30'
+            ? 'bg-sky-950/90 border-sky-500/50 text-sky-200 shadow-sky-950/50'
+            : 'bg-emerald-950/90 border-emerald-500/50 text-emerald-200 shadow-emerald-950/50'
         }`}>
           <span className="w-2.5 h-2.5 rounded-full bg-current animate-ping"></span>
-          <span className="font-medium text-sm">{toast.message}</span>
+          <span className="font-semibold text-xs sm:text-sm">{toast.message}</span>
         </div>
       )}
 
@@ -416,6 +464,7 @@ export default function App() {
             onSelectRoom={(id) => handleNavigate('room-detail', id)}
             onToggleStatus={toggleRoomStatus}
             onAddRoom={() => setRoomModal({ isOpen: true, mode: 'add', data: null })}
+            onSyncAccurateData={handleApplyConvenientPrices}
           />
         )}
 
@@ -442,6 +491,7 @@ export default function App() {
             onAddFish={() => setFishModal({ isOpen: true, mode: 'add', data: null })}
             onEditFish={(fish) => setFishModal({ isOpen: true, mode: 'edit', data: fish })}
             onDeleteFish={deleteFish}
+            onApplyConvenientPrices={handleApplyConvenientPrices}
           />
         )}
 
@@ -480,6 +530,7 @@ export default function App() {
         {activeTab === 'settings' && (
           <Settings 
             onResetData={resetDemoData}
+            onApplyConvenientPrices={handleApplyConvenientPrices}
             showToast={showToast}
             currentUser={currentUser}
             onLogout={handleLogout}

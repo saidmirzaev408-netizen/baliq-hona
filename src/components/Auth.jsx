@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
+import fishHouseLogo from '../assets/logo';
+import { useTranslation } from '../i18n/LanguageContext';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 export function Auth({ onLoginSuccess }) {
+  const { t } = useTranslation();
   const [isRegister, setIsRegister] = useState(false);
   
   // Login form state
@@ -116,16 +120,27 @@ export function Auth({ onLoginSuccess }) {
   return (
     <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden">
       
-      {/* 🌊 High Quality Aquarium Fish Background with parallax effect */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105 transition-transform duration-1000 ease-out"
-        style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1920&q=85')`,
-        }}
-      ></div>
+      {/* 🌐 Top Language Switcher */}
+      <div className="absolute top-5 right-5 z-30">
+        <LanguageSwitcher variant="compact" />
+      </div>
 
-      {/* Deep Ocean Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-[#020617]/95 via-[#061129]/85 to-[#021827]/90 backdrop-blur-[4px]"></div>
+      {/* 🌊 Dynamic Live Aquarium Fish Video Background */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster="https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1920&q=85"
+          className="w-full h-full object-cover opacity-80 scale-105 filter brightness-105 contrast-110 saturate-120"
+        >
+          <source src="https://upload.wikimedia.org/wikipedia/commons/2/29/Freshwater_fish.webm" type="video/webm" />
+          <source src="https://upload.wikimedia.org/wikipedia/commons/2/22/Tropical_Fish_Banner_Fish_on_Coral_Reef.webm" type="video/webm" />
+        </video>
+        {/* Soft Translucent Ocean Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-[#020617]/55 via-[#061129]/40 to-[#021827]/50"></div>
+      </div>
 
       {/* Floating Ambient Glow Orbs */}
       <div className="absolute top-1/4 left-10 w-96 h-96 bg-cyan-500/20 rounded-full blur-[140px] pointer-events-none animate-pulse"></div>
@@ -138,18 +153,12 @@ export function Auth({ onLoginSuccess }) {
         <div className="lg:col-span-5 p-8 lg:p-10 flex flex-col justify-between relative bg-gradient-to-b from-ocean-900/90 to-ocean-950/95 border-b lg:border-b-0 lg:border-r border-cyan-500/20">
           <div>
             {/* Logo & Platform Name */}
-            <div className="flex items-center gap-3.5 mb-6">
-              <div className="w-12 h-12 rounded-2xl gradient-btn flex items-center justify-center shadow-lg shadow-cyan-500/30 ring-2 ring-cyan-400/40">
-                <span className="text-2xl animate-pulse">🐠</span>
-              </div>
-              <div>
-                <h2 className="font-heading font-black text-2xl text-white tracking-wider">
-                  FISH <span className="gradient-text-cyan">HOUSE</span>
-                </h2>
-                <span className="text-[10px] font-semibold tracking-widest uppercase text-cyan-400">
-                  Aquarium Management
-                </span>
-              </div>
+            <div className="mb-6">
+              <img 
+                src={fishHouseLogo} 
+                alt="Fish House" 
+                className="w-full max-w-[280px] h-auto rounded-2xl border border-cyan-400/40 shadow-xl shadow-cyan-500/25"
+              />
             </div>
 
             <h3 className="font-heading font-extrabold text-xl lg:text-2xl text-white leading-tight">
